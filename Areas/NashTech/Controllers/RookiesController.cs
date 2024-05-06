@@ -85,17 +85,17 @@ namespace MVCDay1.Areas.NashTech.Controllers
         public IActionResult OldestMember()
         {
             var members = GetAllPersons();
-            return Json(members.FirstOrDefault(m => DateTime.Now.Year - m.DateOfBirth.Year == members.Max(x => DateTime.Now.Year - x.DateOfBirth.Year)));
+            return View("Index",members.Where(m => DateTime.Now.Year - m.DateOfBirth.Year == members.Max(x => DateTime.Now.Year - x.DateOfBirth.Year)));
         }
 
         public IActionResult MaleMembers()
         {
-            return Json(GetAllPersons().Where(x => x.Gender == "Male"));
+            return View("Index",GetAllPersons().Where(x => x.Gender == "Male"));
         }
 
         public IActionResult FullName()
         {
-            return Json(GetAllPersons().Select(x => x.FullName));
+            return View(GetAllPersons().Select(x => x.FullName));
         }
 
         public IActionResult BirthYear(string option)
@@ -120,19 +120,19 @@ namespace MVCDay1.Areas.NashTech.Controllers
         public IActionResult Older()
         {
             var members = GetAllPersons();
-            return Json(members.Where(x => x.DateOfBirth.Year > 2000));
+            return View("Index",members.Where(x => x.DateOfBirth.Year > 2000));
         }
 
         public IActionResult Younger()
         {
             var members = GetAllPersons();
-            return Json(members.Where(x => x.DateOfBirth.Year < 2000));
+            return View("Index",members.Where(x => x.DateOfBirth.Year < 2000));
         }
 
         public IActionResult Equal()
         {
             var members = GetAllPersons();
-            return Json(members.Where(x => x.DateOfBirth.Year == 2000));
+            return View("Index",members.Where(x => x.DateOfBirth.Year == 2000));
         }
 
         public IActionResult Export()
