@@ -53,8 +53,7 @@ namespace MVCDay1.Areas.NashTech.Controllers
         {
             if (ModelState.IsValid)
             {
-                _personService.Delete(_personService.Find(p.Id));
-                _personService.Create(p);
+                _personService.Edit(p);
             }
             return RedirectToAction("Index");
         }
