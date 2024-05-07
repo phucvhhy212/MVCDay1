@@ -16,7 +16,8 @@ namespace MVCDay1.Areas.NashTech.Controllers
         public IActionResult Index(int page = 1,int recordPerPage = 2)
         {
             var response = _personService.GetAll(page, recordPerPage);
-            TempData["countPage"] = response.CountTotal / recordPerPage;
+            var countPage = Math.Ceiling((double)response.CountTotal / recordPerPage);
+            TempData["countPage"] = (int)countPage;
             return View(response.Persons);
         }
 
