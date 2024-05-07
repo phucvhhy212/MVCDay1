@@ -138,46 +138,18 @@ namespace MVCDay1.Areas.NashTech.Controllers
 
         public MemoryStream ExportData(IEnumerable<Person> persons)
         {
-            var stream = new MemoryStream();
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            ExcelPackage excel = new ExcelPackage(stream);
-            var workSheet = excel.Workbook.Worksheets.Add("Sheet1");
-            workSheet.TabColor = System.Drawing.Color.Black;
-            workSheet.DefaultRowHeight = 12;
-
-            //Header of table  
-            workSheet.Row(1).Height = 20;
-            workSheet.Row(1).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Row(1).Style.Font.Bold = true;
-            workSheet.Cells[1, 1].Value = "First Name";
-            workSheet.Cells[1, 2].Value = "Last Name";
-            workSheet.Cells[1, 3].Value = "Gender";
-            workSheet.Cells[1, 4].Value = "Date Of Birth";
-            workSheet.Cells[1, 5].Value = "Birth Place";
-            workSheet.Cells[1, 6].Value = "Is Graduated";
-
-            //Body of table  
-            int recordIndex = 2;
-            foreach (var person in persons)
+            using (var excelPackage = new ExcelPackage())
             {
-                workSheet.Cells[recordIndex, 1].Value = person.FirstName;
-                workSheet.Cells[recordIndex, 2].Value = person.LastName;
-                workSheet.Cells[recordIndex, 3].Value = person.Gender;
-                workSheet.Cells[recordIndex, 4].Value = person.DateOfBirth.ToString("MM/dd/yyyy");
-                workSheet.Cells[recordIndex, 5].Value = person.BirthPlace;
-                workSheet.Cells[recordIndex, 6].Value = person.IsGraduated;
-                recordIndex++;
+                var worksheet = excelPackage.Workbook.Worksheets.Add("Sheet1");
+                worksheet.Cells.LoadFromCollection(persons, true);
+
+                // AutoFit columns
+                worksheet.Cells.AutoFitColumns();
+
+                var stream = new MemoryStream(excelPackage.GetAsByteArray());
+                return stream;
             }
-
-            workSheet.Column(1).AutoFit();
-            workSheet.Column(2).AutoFit();
-            workSheet.Column(3).AutoFit();
-            workSheet.Column(4).AutoFit();
-            workSheet.Column(5).AutoFit();
-            workSheet.Column(6).AutoFit();
-            excel.Save();
-            return stream;
         }
-
     }
 }
