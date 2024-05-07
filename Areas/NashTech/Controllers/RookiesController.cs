@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.Office2010.Excel;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using Person = MVCDay1.Models.Person;
@@ -9,60 +8,17 @@ namespace MVCDay1.Areas.NashTech.Controllers
     [Area("NashTech")]
     public class RookiesController : Controller
     {
-        private static List<Person> GetAllPersons()
-        {
-            return new List<Person>
-            {
-                new Person
-                {
-                    Id = 1,
-                    FirstName = "Huy1",
-                    LastName = "Phuc1",
-                    BirthPlace = "Ha Noi",
-                    DateOfBirth = DateTime.Today,
-                    Gender = "Female",
-                    IsGraduated = false,
-                    PhoneNumber = "7329074222"
-                },
-                new Person
-                {
-                    Id = 2,
-                    FirstName = "Huy2",
-                    LastName = "Phuc2",
-                    BirthPlace = "HN",
-                    DateOfBirth = DateTime.Parse("2000-11-02"),
-                    Gender = "Male",
-                    IsGraduated = false,
-                    PhoneNumber = "7329074222"
-                },
-                new Person
-                {
-                    Id = 3,
-                    FirstName = "Huy3",
-                    LastName = "Phuc3",
-                    BirthPlace = "Ha Noi",
-                    DateOfBirth = DateTime.Parse("2000-12-02"),
-                    Gender = "Male",
-                    IsGraduated = false,
-                    PhoneNumber = "7329074222"
-                },
-                new Person
-                {
-                    Id = 4,
-                    FirstName = "Huy4",
-                    LastName = "Phuc4",
-                    BirthPlace = "Ha Noi",
-                    DateOfBirth = DateTime.Parse("1999-12-02"),
-                    Gender = "Male",
-                    IsGraduated = false,
-                    PhoneNumber = "7329074222"
-                }
-            };
-        }
+        //public static List<Person> data = GetAllPersons();
 
+        private readonly IPersonService _personService;
+
+        public RookiesController(IPersonService personService)
+        {
+            _personService = personService;
+        }
         public IActionResult Index()
         {
-            return View(GetAllPersons());
+            return View(_personService.GetAll());
         }
 
         public IActionResult Create()
@@ -70,32 +26,55 @@ namespace MVCDay1.Areas.NashTech.Controllers
             return View();
         }
 
-        public IActionResult Edit(int id)
+        [HttpPost]
+        public IActionResult Create(Person p)
         {
-            var persons = GetAllPersons();
-            return View(persons.FirstOrDefault(p => p.Id == id));
+            if (ModelState.IsValid)
+            {
+                p.Id = Guid.NewGuid();
+                _personService.Create(p);
+            }
+
+            return RedirectToAction("Index");
         }
 
-        public IActionResult Details(int id)
+        public IActionResult Edit(Guid id)
         {
-            var persons = GetAllPersons();
-            return View(persons.FirstOrDefault(p => p.Id == id));
+            var data = _personService.GetAll();
+            return View(data.FirstOrDefault(p => p.Id == id));
+        }
+
+        [HttpPost]
+        public IActionResult Edit(Person p)
+        {
+            if (ModelState.IsValid)
+            {
+                _personService.Delete(_personService.Find(p.Id));
+                _personService.Create(p);
+            }
+            return RedirectToAction("Index");
+        }
+        public IActionResult Details(Guid id)
+        {
+            return View(_personService.Find(id));
         }
 
         public IActionResult OldestMember()
         {
-            var members = GetAllPersons();
-            return View("Index",members.Where(m => DateTime.Now.Year - m.DateOfBirth.Year == members.Max(x => DateTime.Now.Year - x.DateOfBirth.Year)));
+            var data = _personService.GetAll();
+            return View("Index",data.Where(m => DateTime.Now.Year - m.DateOfBirth.Year == data.Max(x => DateTime.Now.Year - x.DateOfBirth.Year)));
         }
 
         public IActionResult MaleMembers()
         {
-            return View("Index",GetAllPersons().Where(x => x.Gender == "Male"));
+            var data = _personService.GetAll();
+            return View("Index",data.Where(x => x.Gender == "Male"));
         }
 
         public IActionResult FullName()
         {
-            return View(GetAllPersons().Select(x => x.FullName));
+            var data = _personService.GetAll();
+            return View(data.Select(x => x.FullName));
         }
 
         public IActionResult BirthYear(string option)
@@ -111,33 +90,47 @@ namespace MVCDay1.Areas.NashTech.Controllers
             }
         }
 
-        public IActionResult Delete(int id)
+        public IActionResult Delete(Guid id)
         {
-            var persons = GetAllPersons();
-            return View(persons.FirstOrDefault(p => p.Id == id));
+            var data = _personService.GetAll();
+            return View(data.FirstOrDefault(p => p.Id == id));
         }
 
+        [HttpPost]
+        public IActionResult DeletePerson(Guid id)
+        {
+            var personToRemove = _personService.Find(id);
+            _personService.Delete(personToRemove);
+            TempData["personName"] = personToRemove.FullName;
+            return RedirectToAction("ConfirmDelete");
+        }
+
+        public IActionResult ConfirmDelete()
+        {
+            return View();
+        }
         public IActionResult Older()
         {
-            var members = GetAllPersons();
-            return View("Index",members.Where(x => x.DateOfBirth.Year > 2000));
+            var data = _personService.GetAll();
+            return View("Index",data.Where(x => x.DateOfBirth.Year > 2000));
         }
 
         public IActionResult Younger()
         {
-            var members = GetAllPersons();
-            return View("Index",members.Where(x => x.DateOfBirth.Year < 2000));
+            var data = _personService.GetAll();
+            return View("Index",data.Where(x => x.DateOfBirth.Year < 2000));
         }
 
         public IActionResult Equal()
         {
-            var members = GetAllPersons();
-            return View("Index",members.Where(x => x.DateOfBirth.Year == 2000));
+            var data = _personService.GetAll();
+            return View("Index",data.Where(x => x.DateOfBirth.Year == 2000));
         }
 
         public IActionResult Export()
         {
-            var stream = ExportData(GetAllPersons());
+            var data = _personService.GetAll();
+            var stream = ExportData(data);
             stream.Position = 0;
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "PersonRecords.xlsx");
         }
