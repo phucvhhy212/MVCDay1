@@ -9,6 +9,14 @@ namespace MVCDay1
         
         public PaginatedPersonList GetAll(int? page,int? recordsPerPage)
         {
+            if (page <= 0)
+            {
+                return new PaginatedPersonList
+                {
+                    CountTotal = 0,
+                    Persons = new List<Person> { }
+                };
+            }
             return new PaginatedPersonList
             {
                 CountTotal = data.Count,
@@ -18,13 +26,26 @@ namespace MVCDay1
 
         public void Create(Person person)
         {
-            data.Add(person);
+            var findPerson = Find(person.Id);
+            if (findPerson == null)
+            {
+                data.Add(person);
+            }
         }
 
         public void Edit(Person person)
         {
-            data.Remove(data.FirstOrDefault(x => x.Id == person.Id));
-            data.Add(person);
+            var findPerson = Find(person.Id);
+            if (findPerson != null)
+            {
+                findPerson.FirstName = person.FirstName;
+                findPerson.LastName = person.LastName;
+                findPerson.BirthPlace = person.BirthPlace;
+                findPerson.Gender = person.Gender;
+                findPerson.DateOfBirth = person.DateOfBirth;
+                findPerson.IsGraduated = person.IsGraduated;
+                findPerson.PhoneNumber = person.PhoneNumber;
+            }
         }
 
         public void Delete(Person person)

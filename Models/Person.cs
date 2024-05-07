@@ -1,4 +1,6 @@
-﻿namespace MVCDay1.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace MVCDay1.Models
 {
     public class Person
     {
@@ -7,7 +9,7 @@
         public string LastName { get; set; }
         public string Gender { get; set; }
         public string FullName => LastName + " " + FirstName;
-
+        [DataType(DataType.Date)]
         public DateTime DateOfBirth { get; set; }
         public string PhoneNumber { get; set; }
 

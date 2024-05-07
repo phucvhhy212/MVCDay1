@@ -17,7 +17,11 @@ namespace MVCDay1.Areas.NashTech.Controllers
         {
             var response = _personService.GetAll(page, recordPerPage);
             var countPage = Math.Ceiling((double)response.CountTotal / recordPerPage);
-            TempData["countPage"] = (int)countPage;
+            if (response.Persons.Count() != 0)
+            {
+                TempData["countPage"] = (int)countPage;
+            }
+
             return View(response.Persons);
         }
 
