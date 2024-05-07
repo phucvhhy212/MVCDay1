@@ -8,17 +8,16 @@ namespace MVCDay1.Areas.NashTech.Controllers
     [Area("NashTech")]
     public class RookiesController : Controller
     {
-        //public static List<Person> data = GetAllPersons();
-
         private readonly IPersonService _personService;
-
         public RookiesController(IPersonService personService)
         {
             _personService = personService;
         }
-        public IActionResult Index()
+        public IActionResult Index(int page = 1,int recordPerPage = 2)
         {
-            return View(_personService.GetAll());
+            var response = _personService.GetAll(page, recordPerPage);
+            TempData["countPage"] = response.CountTotal / recordPerPage;
+            return View(response.Persons);
         }
 
         public IActionResult Create()
@@ -40,8 +39,8 @@ namespace MVCDay1.Areas.NashTech.Controllers
 
         public IActionResult Edit(Guid id)
         {
-            var data = _personService.GetAll();
-            return View(data.FirstOrDefault(p => p.Id == id));
+            var response = _personService.GetAll();
+            return View(response.Persons.FirstOrDefault(p => p.Id == id));
         }
 
         [HttpPost]
@@ -61,20 +60,20 @@ namespace MVCDay1.Areas.NashTech.Controllers
 
         public IActionResult OldestMember()
         {
-            var data = _personService.GetAll();
-            return View("Index",data.Where(m => DateTime.Now.Year - m.DateOfBirth.Year == data.Max(x => DateTime.Now.Year - x.DateOfBirth.Year)));
+            var response = _personService.GetAll();
+            return View("Index",response.Persons.Where(m => DateTime.Now.Year - m.DateOfBirth.Year == response.Persons.Max(x => DateTime.Now.Year - x.DateOfBirth.Year)));
         }
 
         public IActionResult MaleMembers()
         {
-            var data = _personService.GetAll();
-            return View("Index",data.Where(x => x.Gender == "Male"));
+            var response = _personService.GetAll();
+            return View("Index",response.Persons.Where(x => x.Gender == "Male"));
         }
 
         public IActionResult FullName()
         {
-            var data = _personService.GetAll();
-            return View(data.Select(x => x.FullName));
+            var response = _personService.GetAll();
+            return View(response.Persons.Select(x => x.FullName));
         }
 
         public IActionResult BirthYear(string option)
@@ -92,8 +91,8 @@ namespace MVCDay1.Areas.NashTech.Controllers
 
         public IActionResult Delete(Guid id)
         {
-            var data = _personService.GetAll();
-            return View(data.FirstOrDefault(p => p.Id == id));
+            var response = _personService.GetAll();
+            return View(response.Persons.FirstOrDefault(p => p.Id == id));
         }
 
         [HttpPost]
@@ -111,26 +110,26 @@ namespace MVCDay1.Areas.NashTech.Controllers
         }
         public IActionResult Older()
         {
-            var data = _personService.GetAll();
-            return View("Index",data.Where(x => x.DateOfBirth.Year > 2000));
+            var response = _personService.GetAll();
+            return View("Index",response.Persons.Where(x => x.DateOfBirth.Year > 2000));
         }
 
         public IActionResult Younger()
         {
-            var data = _personService.GetAll();
-            return View("Index",data.Where(x => x.DateOfBirth.Year < 2000));
+            var response = _personService.GetAll();
+            return View("Index",response.Persons.Where(x => x.DateOfBirth.Year < 2000));
         }
 
         public IActionResult Equal()
         {
-            var data = _personService.GetAll();
-            return View("Index",data.Where(x => x.DateOfBirth.Year == 2000));
+            var response = _personService.GetAll();
+            return View("Index",response.Persons.Where(x => x.DateOfBirth.Year == 2000));
         }
 
         public IActionResult Export()
         {
-            var data = _personService.GetAll();
-            var stream = ExportData(data);
+            var response = _personService.GetAll();
+            var stream = ExportData(response.Persons);
             stream.Position = 0;
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "PersonRecords.xlsx");
         }

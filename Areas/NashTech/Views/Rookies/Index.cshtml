@@ -76,3 +76,13 @@
 }
     </tbody>
 </table>
+
+@{
+    if (TempData["countPage"] != null)
+    {
+        for (int i = 1; i <= (int)TempData["countPage"];i++)
+        {
+            <a asp-action="Index" asp-route-page="@i">@i</a>
+        }
+    }
+}

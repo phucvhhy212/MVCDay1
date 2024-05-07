@@ -1,15 +1,19 @@
 ﻿using MVCDay1.Models;
+using MVCDay1.NewFolder;
 
 namespace MVCDay1
 {
     public class PersonService:IPersonService
     {
         private static List<Person> data = GetAllPersons();
-
         
-        public IEnumerable<Person> GetAll()
+        public PaginatedPersonList GetAll(int? page,int? recordsPerPage)
         {
-            return data;
+            return new PaginatedPersonList
+            {
+                CountTotal = data.Count,
+                Persons = page == null && recordsPerPage == null ? data : data.Skip((page.Value-1) * recordsPerPage.Value).Take(recordsPerPage.Value)
+            };
         }
 
         public void Create(Person person)
