@@ -21,7 +21,6 @@ namespace MVCDay1.Areas.NashTech.Controllers
             {
                 TempData["countPage"] = (int)countPage;
             }
-
             return View(response.Persons);
         }
 
@@ -38,7 +37,6 @@ namespace MVCDay1.Areas.NashTech.Controllers
                 p.Id = Guid.NewGuid();
                 _personService.Create(p);
             }
-
             return RedirectToAction("Index");
         }
 
@@ -146,8 +144,8 @@ namespace MVCDay1.Areas.NashTech.Controllers
             var workSheet = excel.Workbook.Worksheets.Add("Sheet1");
             workSheet.TabColor = System.Drawing.Color.Black;
             workSheet.DefaultRowHeight = 12;
-            //Header of table  
 
+            //Header of table  
             workSheet.Row(1).Height = 20;
             workSheet.Row(1).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Row(1).Style.Font.Bold = true;
@@ -157,8 +155,8 @@ namespace MVCDay1.Areas.NashTech.Controllers
             workSheet.Cells[1, 4].Value = "Date Of Birth";
             workSheet.Cells[1, 5].Value = "Birth Place";
             workSheet.Cells[1, 6].Value = "Is Graduated";
+
             //Body of table  
-            //  
             int recordIndex = 2;
             foreach (var person in persons)
             {
