@@ -101,9 +101,13 @@ namespace MVCDay1.Areas.NashTech.Controllers
         public IActionResult DeletePerson(Guid id)
         {
             var personToRemove = _personService.Find(id);
-            _personService.Delete(personToRemove);
-            TempData["personName"] = personToRemove.FullName;
-            return RedirectToAction("ConfirmDelete");
+            if (personToRemove != null)
+            {
+                _personService.Delete(personToRemove);
+                TempData["personName"] = personToRemove.FullName;
+                return RedirectToAction("ConfirmDelete");
+            }
+            return RedirectToAction("Index");
         }
 
         public IActionResult ConfirmDelete()
